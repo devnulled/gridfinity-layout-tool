@@ -62,10 +62,13 @@ export const BIN_FEATURE_BUILDERS: readonly FeatureBuilder[] = [
 
 /**
  * The subset a solid body can still take. Every other builder here shapes an
- * interior a solid bin does not have; wall text works the outer face, which is
- * the same wall either way.
+ * interior a solid bin does not have. Wall text and wall cutouts work the outer
+ * walls, which a solid bin has exactly like a hollow one. A wall cutout only
+ * reaches about a wall's thickness, so a notch through a solid bin needs a pocket
+ * cutout behind it to clear the fill.
  */
 export const SOLID_FEATURE_BUILDERS: readonly FeatureBuilder[] = [
+  wallCutoutsFeature,
   wallTextCutFeature,
   wallTextEmbossFeature,
   wallLabelSlotBossesFeature,

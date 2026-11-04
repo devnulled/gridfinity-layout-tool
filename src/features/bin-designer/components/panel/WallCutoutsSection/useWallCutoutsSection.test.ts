@@ -222,13 +222,13 @@ describe('useWallCutoutsSection', () => {
     expect(result.current.state.linked).toBe(true);
   });
 
-  it('disabledReason set when style is solid', () => {
+  it('no disabledReason when style is solid', () => {
     useDesignerStore.setState({
       params: { ...DEFAULT_BIN_PARAMS, style: 'solid' },
     });
 
     const { result } = renderHook(() => useWallCutoutsSection());
-    expect(result.current.meta.disabledReason).toBeDefined();
+    expect(result.current.meta.disabledReason).toBeUndefined();
   });
 
   it('no disabledReason when style is standard', () => {

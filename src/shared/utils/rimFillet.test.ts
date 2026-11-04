@@ -17,6 +17,13 @@ describe('rim settings', () => {
     ).toBe(0);
   });
 
+  it('rounds a solid bin past half a wall, up to the schema ceiling', () => {
+    const base = { ...DEFAULT_BIN_PARAMS.base, stackingLip: false, solid: true, rimFillet: true };
+    const solid = { ...DEFAULT_BIN_PARAMS, style: 'solid' as const, wallThickness: 1.8 };
+    expect(effectiveRimFilletRadius({ ...solid, base: { ...base, rimFilletRadius: 3 } })).toBe(3);
+    expect(effectiveRimFilletRadius({ ...solid, base: { ...base, rimFilletRadius: 9 } })).toBe(5);
+  });
+
   it('validates persisted settings and rejects invalid values', () => {
     expect(
       validateBase({ ...DEFAULT_BIN_PARAMS.base, rimFillet: true, rimFilletRadius: 0.4 })

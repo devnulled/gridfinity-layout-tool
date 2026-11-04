@@ -199,13 +199,13 @@ describe('WallCutoutsSection', () => {
     });
   });
 
-  it('shows disabled reason for solid bins', () => {
+  it('stays available for solid bins', () => {
     useDesignerStore.setState({
       params: { ...DEFAULT_BIN_PARAMS, style: 'solid' },
     });
 
     render(<WallCutoutsSection />);
-    expect(screen.getByText(/Not available/)).toBeDefined();
+    expect(screen.queryByText(/Not available/)).toBeNull();
   });
 
   it('does not show controls when disabled', () => {

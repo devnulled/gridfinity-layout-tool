@@ -376,6 +376,11 @@ function buildWallCutoutCutsInScope(
   const lipOverhang = hasLip ? lipInnerReachMm(params) : 0;
   const extrudeDepth = (maxThickness + lipOverhang) * 2 + 1 + 2 * depthPadding;
   const overshoot = (hasLip ? LIP_HEIGHT : 0) + CUT_RIM_CLEARANCE;
+  // A solid bin has fill behind each wall, so its notch runs on through the
+  // block and the profile shapes the whole opening. The cut is centred on the
+  // wall's inner face, so twice the span ends at the opposite inner face and
+  // leaves that wall whole.
+  const solidReach = (span: number): number => 2 * span;
 
   // For non-rectangular bins, map each side to the outermost polygon edge
   // facing that direction (silently skipping sides with no matching edge).
@@ -419,7 +424,7 @@ function buildWallCutoutCutsInScope(
         cutWidth,
         userCutHeight,
         overshoot,
-        extrudeDepth,
+        params.style === 'solid' ? solidReach(side.rotateZ === 0 ? innerD : innerW) : extrudeDepth,
         wallHeight,
         {
           x: side.rotateZ === 0 ? side.x + centerOffset : side.x,
@@ -507,6 +512,7 @@ export const wallCutoutsFeature: FeatureBuilder = {
         'v2',
         dim.shellKey,
         stableSerialize(params.walls),
+        params.style,
         quantize(dim.innerW),
         quantize(dim.innerD),
         quantize(dim.wallHeight),
