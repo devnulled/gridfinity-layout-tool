@@ -58,7 +58,54 @@ function scoopEverywhere(
   });
 }
 
+/**
+ * A solid bin's wall notch runs through the fill to the opposite wall's inner
+ * face, so the notch profile shapes the whole opening. Dropping the builder
+ * from the solid set, or cutting only the wall's thickness, leaves the fill at
+ * full height with every structural check still passing.
+ */
+function solidNotchThroughFill(): ScenarioCase {
+  const notch: WallCutout = {
+    ...DISABLED_WALL_CUTOUT,
+    enabled: true,
+    width: 50,
+    depth: 70,
+    cornerRadiusTop: 8,
+    cornerRadiusBottom: 8,
+  };
+  const bin = { width: 1, depth: 2, height: 6, style: 'solid' as const };
+  const base = { ...DEFAULT_BIN_PARAMS.base, solid: true };
+  const walls: BinParams['walls'] = {
+    ...DEFAULT_BIN_PARAMS.walls,
+    enabled: true,
+    left: notch,
+    right: DISABLED_WALL_CUTOUT,
+  };
+  return defineScenario('wall cutouts', 'solid bin with a left notch through the fill', {
+    assert: 'structural',
+    params: { ...bin, base, walls },
+    compareWith: {
+      params: { ...bin, base, walls: { ...walls, enabled: false } },
+      assert: (cut, plain) => {
+        const bb = boundingBox(plain.vertices);
+        const t = DEFAULT_BIN_PARAMS.wallThickness / 2;
+        const left = bb.minX + t;
+        const right = bb.maxX - t;
+        expect(topAt(cut, left, 0), 'left wall is notched').toBeLessThan(
+          topAt(plain, left, 0) - 10
+        );
+        expect(topAt(cut, 0, 0), 'fill is cut').toBeLessThan(topAt(plain, 0, 0) - 10);
+        expect(topAt(cut, right, 0), 'right wall stays whole').toBeCloseTo(
+          topAt(plain, right, 0),
+          1
+        );
+      },
+    },
+  });
+}
+
 export const wallCutouts: ScenarioCase[] = [
+  solidNotchThroughFill(),
   defineScenario('wall cutouts', 'standard bin with global wall cutouts', {
     assert: 'structural',
     params: {

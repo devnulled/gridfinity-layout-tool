@@ -5,7 +5,13 @@ export function maxRimFilletRadius(wallThickness: number): number {
   return Math.max(0.1, Math.floor((wallThickness / 2 - 0.01) * 100) / 100);
 }
 
+/** Schema ceiling for `rimFilletRadius`. */
+const MAX_RIM_FILLET_MM = 5;
+
 export function maxBinRimFilletRadius(params: BinParams): number {
+  // A solid bin's rim is the block's top face, not a wall, so half a wall's
+  // thickness does not bound it.
+  if (params.base.solid) return MAX_RIM_FILLET_MM;
   const hasDividers = new Set(params.compartments.cells).size > 1;
   return maxRimFilletRadius(
     hasDividers
@@ -15,7 +21,7 @@ export function maxBinRimFilletRadius(params: BinParams): number {
 }
 
 export function rimFilletAvailable(params: BinParams): boolean {
-  return !params.base.stackingLip && !params.base.solid && !params.cellMask;
+  return !params.base.stackingLip && !params.cellMask;
 }
 
 export function effectiveRimFilletRadius(params: BinParams): number {

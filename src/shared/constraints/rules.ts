@@ -433,7 +433,6 @@ export const CONSTRAINT_RULES: readonly ConstraintRule[] = [
       'wallPattern',
       'floorPattern',
       'inserts',
-      'wallCutouts',
       'handles',
     ],
     reason: 'binDesigner.solidDisablesCavity',
